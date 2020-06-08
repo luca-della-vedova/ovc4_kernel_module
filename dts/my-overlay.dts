@@ -1,0 +1,16 @@
+/dts-v1/;
+/plugin/;
+ 
+/ {
+    overlay-name = "My Jetson Overlay";
+    // Xavier NX module
+    compatible = "nvidia,p3509-0000+p3668-0001";
+ 
+    fragment@0 {
+        target-path = "/";
+        __overlay__ {
+            my-custom-property = "This Is My Overlay";
+        };
+    };
+};
+
