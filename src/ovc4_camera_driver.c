@@ -338,7 +338,6 @@ static int ovc4cam_probe(struct i2c_client *client,
 	tc_dev->tcctrl_ops = &ovc4cam_ctrl_ops;
 
 	err = tegracam_device_register(tc_dev);
-	dev_info(dev, "device registered\n");
 	if (err) {
 		dev_err(dev, "tegra camera driver registration failed\n");
 		return err;
@@ -349,14 +348,12 @@ static int ovc4cam_probe(struct i2c_client *client,
 	tegracam_set_privdata(tc_dev, (void *)priv);
 
 	err = ovc4cam_board_setup(priv);
-	dev_info(dev, "board setup\n");
 	if (err) {
 		dev_err(dev, "board setup failed\n");
 		return err;
 	}
 
 	err = tegracam_v4l2subdev_register(tc_dev, true);
-	dev_info(dev, "v4l2 subdev registered\n");
 	if (err) {
 		dev_err(dev, "tegra camera subdev registration failed\n");
 		return err;
