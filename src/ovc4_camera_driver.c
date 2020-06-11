@@ -1,5 +1,5 @@
 /*
- * imx185.c - imx185 sensor driver
+ * ovc4cam.c - ovc4cam sensor driver
  *
  * Copyright (c) 2016-2019, NVIDIA CORPORATION.  All rights reserved.
  *
@@ -30,16 +30,16 @@
 #define CREATE_TRACE_POINTS
 #include <trace/events/imx185.h>
 
-static const struct of_device_id imx185_of_match[] = {
+static const struct of_device_id ovc4cam_of_match[] = {
 	{ .compatible = "nvidia,ovc4cam",},
 	{ },
 };
-MODULE_DEVICE_TABLE(of, imx185_of_match);
+MODULE_DEVICE_TABLE(of, ovc4cam_of_match);
 
 static const u32 ctrl_cid_list[] = {
 };
 
-struct imx185 {
+struct ovc4cam {
 	struct i2c_client	*i2c_client;
 	struct v4l2_subdev	*subdev;
 	u32				frame_length;
@@ -58,26 +58,26 @@ static const struct regmap_config sensor_regmap_config = {
 static int test_mode;
 module_param(test_mode, int, 0644);
 
-static inline int imx185_read_reg(struct camera_common_data *s_data,
+static inline int ovc4cam_read_reg(struct camera_common_data *s_data,
 				u16 addr, u8 *val)
 {
   // unimplemented
   return 0;
 }
 
-static int imx185_write_reg(struct camera_common_data *s_data,
+static int ovc4cam_write_reg(struct camera_common_data *s_data,
 				u16 addr, u8 val)
 {
   // unimplemented
   return 0;
 }
 
-static struct tegracam_ctrl_ops imx185_ctrl_ops = {
+static struct tegracam_ctrl_ops ovc4cam_ctrl_ops = {
 	.numctrls = ARRAY_SIZE(ctrl_cid_list),
 	.ctrl_cid_list = ctrl_cid_list,
 };
 
-static int imx185_power_on(struct camera_common_data *s_data)
+static int ovc4cam_power_on(struct camera_common_data *s_data)
 {
   // TODO gpio reset here or move to to probe
 	int err = 0;
@@ -108,7 +108,7 @@ static int imx185_power_on(struct camera_common_data *s_data)
 
 }
 
-static int imx185_power_off(struct camera_common_data *s_data)
+static int ovc4cam_power_off(struct camera_common_data *s_data)
 {
 	int err = 0;
 	struct camera_common_power_rail *pw = s_data->power;
@@ -136,7 +136,7 @@ power_off_done:
 	return 0;
 }
 
-static int imx185_power_get(struct tegracam_device *tc_dev)
+static int ovc4cam_power_get(struct tegracam_device *tc_dev)
 {
 	struct device *dev = tc_dev->dev;
 	struct camera_common_data *s_data = tc_dev->s_data;
@@ -166,7 +166,7 @@ static int imx185_power_get(struct tegracam_device *tc_dev)
 	return err;
 }
 
-static int imx185_power_put(struct tegracam_device *tc_dev)
+static int ovc4cam_power_put(struct tegracam_device *tc_dev)
 {
 	struct camera_common_data *s_data = tc_dev->s_data;
 	struct camera_common_power_rail *pw = s_data->power;
@@ -177,7 +177,7 @@ static int imx185_power_put(struct tegracam_device *tc_dev)
 	return 0;
 }
 
-static struct camera_common_pdata *imx185_parse_dt(struct tegracam_device *tc_dev)
+static struct camera_common_pdata *ovc4cam_parse_dt(struct tegracam_device *tc_dev)
 {
 	struct device *dev = tc_dev->dev;
 	struct device_node *np = dev->of_node;
@@ -191,7 +191,7 @@ static struct camera_common_pdata *imx185_parse_dt(struct tegracam_device *tc_de
 	if (!np)
 		return NULL;
 
-	match = of_match_device(imx185_of_match, dev);
+	match = of_match_device(ovc4cam_of_match, dev);
 	if (!match) {
 		dev_err(dev, "Failed to find matching dt id\n");
 		return NULL;
@@ -224,41 +224,41 @@ error:
 	return ret;
 }
 
-static int imx185_set_mode(struct tegracam_device *tc_dev)
+static int ovc4cam_set_mode(struct tegracam_device *tc_dev)
 {
   // unimplemented
   return 0;
 }
 
-static int imx185_start_streaming(struct tegracam_device *tc_dev)
+static int ovc4cam_start_streaming(struct tegracam_device *tc_dev)
 {
   // unimplemented
   return 0;
 }
 
-static int imx185_stop_streaming(struct tegracam_device *tc_dev)
+static int ovc4cam_stop_streaming(struct tegracam_device *tc_dev)
 {
   // unimplemented
   return 0;
 }
 
 
-static struct camera_common_sensor_ops imx185_common_ops = {
+static struct camera_common_sensor_ops ovc4cam_common_ops = {
 	//.numfrmfmts = ARRAY_SIZE(imx219_frmfmt),
 	//.frmfmt_table = imx219_frmfmt,
-	.power_on = imx185_power_on,
-	.power_off = imx185_power_off,
-	.write_reg = imx185_write_reg,
-	.read_reg = imx185_read_reg,
-	.parse_dt = imx185_parse_dt,
-	.power_get = imx185_power_get,
-	.power_put = imx185_power_put,
-	.set_mode = imx185_set_mode,
-	.start_streaming = imx185_start_streaming,
-	.stop_streaming = imx185_stop_streaming,
+	.power_on = ovc4cam_power_on,
+	.power_off = ovc4cam_power_off,
+	.write_reg = ovc4cam_write_reg,
+	.read_reg = ovc4cam_read_reg,
+	.parse_dt = ovc4cam_parse_dt,
+	.power_get = ovc4cam_power_get,
+	.power_put = ovc4cam_power_put,
+	.set_mode = ovc4cam_set_mode,
+	.start_streaming = ovc4cam_start_streaming,
+	.stop_streaming = ovc4cam_stop_streaming,
 };
 
-static int imx185_board_setup(struct imx185 *priv)
+static int ovc4cam_board_setup(struct ovc4cam *priv)
 {
 	struct camera_common_data *s_data = priv->s_data;
 	struct device *dev = s_data->dev;
@@ -273,7 +273,7 @@ static int imx185_board_setup(struct imx185 *priv)
 		return err;
 	}
 
-	err = imx185_power_on(s_data);
+	err = ovc4cam_power_on(s_data);
 	if (err) {
 		dev_err(dev,
 			"Error %d during power on sensor\n", err);
@@ -283,33 +283,32 @@ static int imx185_board_setup(struct imx185 *priv)
   return 0;
 }
 
-static int imx185_open(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
+static int ovc4cam_open(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 {
   // unimplemented
 	return 0;
 }
 
-static const struct v4l2_subdev_internal_ops imx185_subdev_internal_ops = {
-	.open = imx185_open,
+static const struct v4l2_subdev_internal_ops ovc4cam_subdev_internal_ops = {
+	.open = ovc4cam_open,
 };
 
 // TODO consider moving away from i2c driver
-static int imx185_probe(struct i2c_client *client,
+static int ovc4cam_probe(struct i2c_client *client,
 			const struct i2c_device_id *id)
 {
 	struct device *dev = &client->dev;
 	struct tegracam_device *tc_dev;
-	struct imx185 *priv;
+	struct ovc4cam *priv;
 	int err;
 
 	dev_info(dev, "probing v4l2 sensor\n");
-  printk(KERN_INFO "Probing ovc4 driver\n");
 
 	if (!IS_ENABLED(CONFIG_OF) || !client->dev.of_node)
 		return -EINVAL;
 
 	priv = devm_kzalloc(dev,
-			sizeof(struct imx185), GFP_KERNEL);
+			sizeof(struct ovc4cam), GFP_KERNEL);
 	if (!priv)
 		return -ENOMEM;
 
@@ -320,11 +319,11 @@ static int imx185_probe(struct i2c_client *client,
 
 	priv->i2c_client = tc_dev->client = client;
 	tc_dev->dev = dev;
-	strncpy(tc_dev->name, "imx185", sizeof(tc_dev->name));
+	strncpy(tc_dev->name, "ovc4cam", sizeof(tc_dev->name));
 	tc_dev->dev_regmap_config = &sensor_regmap_config;
-	tc_dev->sensor_ops = &imx185_common_ops;
-	tc_dev->v4l2sd_internal_ops = &imx185_subdev_internal_ops;
-	tc_dev->tcctrl_ops = &imx185_ctrl_ops;
+	tc_dev->sensor_ops = &ovc4cam_common_ops;
+	tc_dev->v4l2sd_internal_ops = &ovc4cam_subdev_internal_ops;
+	tc_dev->tcctrl_ops = &ovc4cam_ctrl_ops;
 
 	err = tegracam_device_register(tc_dev);
 	if (err) {
@@ -336,7 +335,7 @@ static int imx185_probe(struct i2c_client *client,
 	priv->subdev = &tc_dev->s_data->subdev;
 	tegracam_set_privdata(tc_dev, (void *)priv);
 
-	err = imx185_board_setup(priv);
+	err = ovc4cam_board_setup(priv);
 	if (err) {
 		dev_err(dev, "board setup failed\n");
 		return err;
@@ -348,17 +347,16 @@ static int imx185_probe(struct i2c_client *client,
 		return err;
 	}
 
-	dev_info(dev, "Detected IMX185 sensor\n");
-  printk(KERN_INFO "ovc4 driver probed\n");
+	dev_info(dev, "ovc4cam probed successfully\n");
 
 	return 0;
 }
 
 static int
-imx185_remove(struct i2c_client *client)
+ovc4cam_remove(struct i2c_client *client)
 {
 	struct camera_common_data *s_data = to_camera_common_data(&client->dev);
-	struct imx185 *priv = (struct imx185 *)s_data->priv;
+	struct ovc4cam *priv = (struct ovc4cam *)s_data->priv;
 
 	tegracam_v4l2subdev_unregister(priv->tc_dev);
 	tegracam_device_unregister(priv->tc_dev);
@@ -366,25 +364,25 @@ imx185_remove(struct i2c_client *client)
 	return 0;
 }
 
-static const struct i2c_device_id imx185_id[] = {
-	{ "imx185", 0 },
+static const struct i2c_device_id ovc4cam_id[] = {
+	{ "ovc4cam", 0 },
 	{ }
 };
 
-MODULE_DEVICE_TABLE(i2c, imx185_id);
+MODULE_DEVICE_TABLE(i2c, ovc4cam_id);
 
-static struct i2c_driver imx185_i2c_driver = {
+static struct i2c_driver ovc4cam_i2c_driver = {
 	.driver = {
-		.name = "imx185",
+		.name = "ovc4cam",
 		.owner = THIS_MODULE,
-		.of_match_table = of_match_ptr(imx185_of_match),
+		.of_match_table = of_match_ptr(ovc4cam_of_match),
 	},
-	.probe = imx185_probe,
-	.remove = imx185_remove,
-	.id_table = imx185_id,
+	.probe = ovc4cam_probe,
+	.remove = ovc4cam_remove,
+	.id_table = ovc4cam_id,
 };
 
-module_i2c_driver(imx185_i2c_driver);
+module_i2c_driver(ovc4cam_i2c_driver);
 
 MODULE_DESCRIPTION("Media Controller driver for Sony IMX185");
 MODULE_AUTHOR("NVIDIA Corporation");
