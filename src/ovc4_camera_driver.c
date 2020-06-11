@@ -38,6 +38,9 @@ MODULE_DEVICE_TABLE(of, ovc4cam_of_match);
 
 // Dummy, remove?
 static const u32 ctrl_cid_list[] = {
+  TEGRA_CAMERA_CID_GAIN,
+  TEGRA_CAMERA_CID_EXPOSURE,
+  TEGRA_CAMERA_CID_FRAME_RATE,
   TEGRA_CAMERA_CID_SENSOR_MODE_ID,
 };
 
@@ -60,23 +63,43 @@ static const struct regmap_config sensor_regmap_config = {
 static int test_mode;
 module_param(test_mode, int, 0644);
 
-static inline int ovc4cam_read_reg(struct camera_common_data *s_data,
-				u16 addr, u8 *val)
+static int imx219_set_gain(struct tegracam_device *tc_dev, s64 val)
 {
-  // unimplemented
   return 0;
 }
 
-static int ovc4cam_write_reg(struct camera_common_data *s_data,
-				u16 addr, u8 val)
+static int imx219_set_exposure(struct tegracam_device *tc_dev, s64 val)
 {
-  // unimplemented
+  return 0;
+}
+
+static int imx219_set_frame_rate(struct tegracam_device *tc_dev, s64 val)
+{
+  return 0;
+}
+
+static int imx219_set_group_hold(struct tegracam_device *tc_dev, bool val)
+{
+  return 0;
+}
+
+static inline int ovc4cam_read_reg(struct camera_common_data *s_data, u16 addr, u8 *val)
+{
+  return 0;
+}
+
+static int ovc4cam_write_reg(struct camera_common_data *s_data, u16 addr, u8 val)
+{
   return 0;
 }
 
 static struct tegracam_ctrl_ops ovc4cam_ctrl_ops = {
 	.numctrls = ARRAY_SIZE(ctrl_cid_list),
 	.ctrl_cid_list = ctrl_cid_list,
+  .set_gain = imx219_set_gain,
+  .set_exposure = imx219_set_exposure,
+  .set_frame_rate = imx219_set_frame_rate,
+  .set_group_hold = imx219_set_group_hold,
 };
 
 static int ovc4cam_power_on(struct camera_common_data *s_data)
@@ -315,6 +338,7 @@ static int ovc4cam_probe(struct i2c_client *client,
 	tc_dev->tcctrl_ops = &ovc4cam_ctrl_ops;
 
 	err = tegracam_device_register(tc_dev);
+	dev_info(dev, "device registered\n");
 	if (err) {
 		dev_err(dev, "tegra camera driver registration failed\n");
 		return err;
@@ -325,12 +349,14 @@ static int ovc4cam_probe(struct i2c_client *client,
 	tegracam_set_privdata(tc_dev, (void *)priv);
 
 	err = ovc4cam_board_setup(priv);
+	dev_info(dev, "board setup\n");
 	if (err) {
 		dev_err(dev, "board setup failed\n");
 		return err;
 	}
 
 	err = tegracam_v4l2subdev_register(tc_dev, true);
+	dev_info(dev, "v4l2 subdev registered\n");
 	if (err) {
 		dev_err(dev, "tegra camera subdev registration failed\n");
 		return err;
