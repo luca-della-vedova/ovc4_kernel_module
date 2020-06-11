@@ -1,5 +1,5 @@
 /*
- * imx219_tables.h - sensor mode tables for imx219 HDR sensor.
+ * ovc4cam_tables.h - sensor mode tables for ovc4cam HDR sensor.
  *
  * Copyright (c) 2015-2019, NVIDIA CORPORATION, All Rights Reserved.
  *
@@ -16,27 +16,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __IMX219_I2C_TABLES__
-#define __IMX219_I2C_TABLES__
+#ifndef __OVC4CAM_I2C_TABLES__
+#define __OVC4CAM_I2C_TABLES__
 
-#define IMX219_TABLE_WAIT_MS	0
-#define IMX219_TABLE_END	1
+#define OVC4CAM_TABLE_WAIT_MS	0
+#define OVC4CAM_TABLE_END	1
 
-#define imx219_reg struct reg_8
+#define ovc4cam_reg struct reg_8
 
-static imx219_reg imx219_start_stream[] = {
+static ovc4cam_reg ovc4cam_start_stream[] = {
 	{0x0100, 0x01},
-	{IMX219_TABLE_WAIT_MS, 3},
-	{IMX219_TABLE_END, 0x00}
+	{OVC4CAM_TABLE_WAIT_MS, 3},
+	{OVC4CAM_TABLE_END, 0x00}
 };
 
-static imx219_reg imx219_stop_stream[] = {
+static ovc4cam_reg ovc4cam_stop_stream[] = {
 	{0x0100, 0x00},
-	{IMX219_TABLE_END, 0x00}
+	{OVC4CAM_TABLE_END, 0x00}
 };
 
-static imx219_reg imx219_mode_common[] = {
-	{IMX219_TABLE_WAIT_MS, 10},
+static ovc4cam_reg ovc4cam_mode_common[] = {
+	{OVC4CAM_TABLE_WAIT_MS, 10},
 	/* software reset */
 	{0x0103, 0x01},
 	/* sensor config */
@@ -64,10 +64,10 @@ static imx219_reg imx219_mode_common[] = {
 	{0x4793, 0x10},
 	{0x4797, 0x0E},
 	{0x479B, 0x0E},
-	{IMX219_TABLE_END, 0x00}
+	{OVC4CAM_TABLE_END, 0x00}
 };
 
-static imx219_reg imx219_mode_3264x2464_21fps[] = {
+static ovc4cam_reg ovc4cam_mode_3264x2464_21fps[] = {
 	/* capture settings */
 	{0x0157, 0x00}, /* ANALOG_GAIN_GLOBAL[7:0] */
 	{0x015A, 0x09}, /* COARSE_INTEG_TIME[15:8] */
@@ -112,26 +112,26 @@ static imx219_reg imx219_mode_3264x2464_21fps[] = {
 	{0x030B, 0x01},
 	{0x030C, 0x00},
 	{0x030D, 0x72},
-	{IMX219_TABLE_END, 0x00}
+	{OVC4CAM_TABLE_END, 0x00}
 };
 
 enum {
-	IMX219_MODE_3264x2464_21FPS,
+	OVC4CAM_MODE_3264x2464_21FPS,
 
-	IMX219_MODE_COMMON,
-	IMX219_START_STREAM,
-	IMX219_STOP_STREAM,
+	OVC4CAM_MODE_COMMON,
+	OVC4CAM_START_STREAM,
+	OVC4CAM_STOP_STREAM,
 };
 
-static imx219_reg *mode_table[] = {
-	[IMX219_MODE_3264x2464_21FPS] = imx219_mode_3264x2464_21fps,
+static ovc4cam_reg *mode_table[] = {
+	[OVC4CAM_MODE_3264x2464_21FPS] = ovc4cam_mode_3264x2464_21fps,
 
-	[IMX219_MODE_COMMON]  = imx219_mode_common,
-	[IMX219_START_STREAM]  = imx219_start_stream,
-	[IMX219_STOP_STREAM]  = imx219_stop_stream,
+	[OVC4CAM_MODE_COMMON]  = ovc4cam_mode_common,
+	[OVC4CAM_START_STREAM]  = ovc4cam_start_stream,
+	[OVC4CAM_STOP_STREAM]  = ovc4cam_stop_stream,
 };
 
-static const int imx219_21fps[] = {
+static const int ovc4cam_21fps[] = {
 	21,
 };
 
@@ -139,15 +139,15 @@ static const int imx219_21fps[] = {
  * WARNING: frmfmt ordering need to match mode definition in
  * device tree!
  */
-static const struct camera_common_frmfmt imx219_frmfmt[] = {
-	{{3264, 2464},	imx219_21fps, 1, 0, IMX219_MODE_3264x2464_21FPS},
+static const struct camera_common_frmfmt ovc4cam_frmfmt[] = {
+	{{3264, 2464},	ovc4cam_21fps, 1, 0, OVC4CAM_MODE_3264x2464_21FPS},
 	/* Add modes with no device tree support after below */
   /*
-	{{3264, 1848},	imx219_28fps, 1, 0, IMX219_MODE_3264x1848_28FPS},
-	{{1920, 1080},	imx219_30fps, 1, 0, IMX219_MODE_1920x1080_30FPS},
-	{{1280, 720},	imx219_60fps, 1, 0, IMX219_MODE_1280x720_60FPS},
-	{{1280, 720},	imx219_120fps, 1, 0, IMX219_MODE_1280x720_120FPS},
+	{{3264, 1848},	ovc4cam_28fps, 1, 0, OVC4CAM_MODE_3264x1848_28FPS},
+	{{1920, 1080},	ovc4cam_30fps, 1, 0, OVC4CAM_MODE_1920x1080_30FPS},
+	{{1280, 720},	ovc4cam_60fps, 1, 0, OVC4CAM_MODE_1280x720_60FPS},
+	{{1280, 720},	ovc4cam_120fps, 1, 0, OVC4CAM_MODE_1280x720_120FPS},
   */
 };
 
-#endif /* __IMX219_I2C_TABLES__ */
+#endif /* __OVC4CAM_I2C_TABLES__ */

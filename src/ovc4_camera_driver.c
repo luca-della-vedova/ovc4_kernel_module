@@ -36,7 +36,9 @@ static const struct of_device_id ovc4cam_of_match[] = {
 };
 MODULE_DEVICE_TABLE(of, ovc4cam_of_match);
 
+// Dummy, remove?
 static const u32 ctrl_cid_list[] = {
+  TEGRA_CAMERA_CID_SENSOR_MODE_ID,
 };
 
 struct ovc4cam {
@@ -146,20 +148,6 @@ static int ovc4cam_power_get(struct tegracam_device *tc_dev)
 	struct clk *parent;
 	int err = 0;
 
-	mclk_name = pdata->mclk_name ?
-		    pdata->mclk_name : "extperiph1";
-	pw->mclk = devm_clk_get(dev, mclk_name);
-	if (IS_ERR(pw->mclk)) {
-		dev_err(dev, "unable to get clock %s\n", mclk_name);
-		return PTR_ERR(pw->mclk);
-	}
-
-	parent = devm_clk_get(dev, "pllp_grtba");
-	if (IS_ERR(parent))
-		dev_err(dev, "devm_clk_get failed for pllp_grtba");
-	else
-		clk_set_parent(pw->mclk, parent);
-
 	pw->reset_gpio = pdata->reset_gpio;
 
 	pw->state = SWITCH_OFF;
@@ -187,7 +175,7 @@ static struct camera_common_pdata *ovc4cam_parse_dt(struct tegracam_device *tc_d
 	int err;
 	int gpio;
 
-  printk(KERN_INFO "Parsing dt\n");
+  dev_info(dev, "Parsing dt\n");
 	if (!np)
 		return NULL;
 
@@ -244,8 +232,9 @@ static int ovc4cam_stop_streaming(struct tegracam_device *tc_dev)
 
 
 static struct camera_common_sensor_ops ovc4cam_common_ops = {
-	//.numfrmfmts = ARRAY_SIZE(imx219_frmfmt),
-	//.frmfmt_table = imx219_frmfmt,
+	//.numfrmfmts = 0,
+	.numfrmfmts = ARRAY_SIZE(ovc4cam_frmfmt),
+	.frmfmt_table = ovc4cam_frmfmt,
 	.power_on = ovc4cam_power_on,
 	.power_off = ovc4cam_power_off,
 	.write_reg = ovc4cam_write_reg,
