@@ -34,10 +34,13 @@
 #include <media/camera_common.h>
 #include "ovc4_driver/ovc4cam_mode_tbls.h"
 #include "ovc4_driver/ovc4_camera_driver.h"
+#include "ovc4_driver/uio_map.h"
 
 static char *sensor_name = "null";
 module_param(sensor_name, charp, 0);
 MODULE_PARM_DESC(sensor_name, "Name of the sensor to connect");
+
+static int last_sensor_id = 0; // Hacky, to share between probe and parse_dt function
 
 static const struct of_device_id ovc4cam_of_match[] = {
   { .compatible = "nvidia,ovc4cam",},
@@ -57,11 +60,6 @@ static const u32 ctrl_cid_list[] = {
   TEGRA_CAMERA_CID_SENSOR_MODE_ID,
 };
 
-struct uio_map {
-  u32 test_val;
-
-};
-
 struct ovc4cam {
   struct i2c_client *i2c_client;
   struct v4l2_subdev  *subdev;
@@ -76,8 +74,6 @@ struct ovc4cam {
   // struct platform_device *pdev;
   // This structure contains the memory mapped data
   struct uio_map *uiomap;
-
-  u8 sensor_id; // Matches connector on the board
 };
 
 static const struct regmap_config sensor_regmap_config = {
@@ -92,31 +88,47 @@ module_param(test_mode, int, 0644);
 
 static int imx219_set_gain(struct tegracam_device *tc_dev, s64 val)
 {
+  // Set the gain to be accessed through mmap
+  struct ovc4cam *priv = (struct ovc4cam *)tc_dev->priv;
+  // TODO not return 0 since this is not a success?
+  if (priv == NULL || priv->uiomap == NULL)
+    return 0;
+  priv->uiomap->gain = val;
   return 0;
 }
 
 static int imx219_set_exposure(struct tegracam_device *tc_dev, s64 val)
 {
+  // Set the exposure to be accessed through mmap
+  struct ovc4cam *priv = (struct ovc4cam *)tc_dev->priv;
+  // TODO not return 0 since this is not a success?
+  if (priv == NULL || priv->uiomap == NULL)
+    return 0;
+  priv->uiomap->exposure = val;
   return 0;
 }
 
 static int imx219_set_frame_rate(struct tegracam_device *tc_dev, s64 val)
 {
+  // Unimplemented
   return 0;
 }
 
 static int imx219_set_group_hold(struct tegracam_device *tc_dev, bool val)
 {
+  // Unimplemented
   return 0;
 }
 
 static inline int ovc4cam_read_reg(struct camera_common_data *s_data, u16 addr, u8 *val)
 {
+  // Unimplemented
   return 0;
 }
 
 static int ovc4cam_write_reg(struct camera_common_data *s_data, u16 addr, u8 val)
 {
+  // Unimplemented
   return 0;
 }
 
@@ -257,6 +269,7 @@ static struct camera_common_pdata *ovc4cam_parse_dt(struct tegracam_device *tc_d
     dev_info(dev, "No sensor_id found in device tree\n");
 
   dev_info(dev, "sensor_id is %d\n", sensor_id);
+  last_sensor_id = sensor_id;
 
   return board_priv_pdata;
 
@@ -382,12 +395,10 @@ static int ovc4cam_probe(struct i2c_client *client,
   if (!uioinfo)
     return -ENOMEM;
 
-  uiomap = devm_kzalloc(dev,
-      sizeof(struct uio_map), GFP_KERNEL);
+  uiomap = vzalloc(sizeof(struct uio_map));
   if (!uioinfo)
     return -ENOMEM;
   
-
   priv->i2c_client = tc_dev->client = client;
   tc_dev->dev = dev;
   strncpy(tc_dev->name, "ovc4cam", sizeof(tc_dev->name));
@@ -396,7 +407,9 @@ static int ovc4cam_probe(struct i2c_client *client,
   tc_dev->v4l2sd_internal_ops = &ovc4cam_subdev_internal_ops;
   tc_dev->tcctrl_ops = &ovc4cam_ctrl_ops;
 
+  dev_info(dev, "Registering device\n");
   err = tegracam_device_register(tc_dev);
+  dev_info(dev, "Registered device\n");
   if (err) {
     dev_err(dev, "tegra camera driver registration failed\n");
     return err;
@@ -406,17 +419,16 @@ static int ovc4cam_probe(struct i2c_client *client,
   priv->subdev = &tc_dev->s_data->subdev;
 
   // UIO for memory mapped operations
-  uioinfo->mem[0].addr = uiomap;
+  uioinfo->mem[0].addr = (phys_addr_t) uiomap;
   uioinfo->mem[0].size = sizeof(uiomap);
-  uioinfo->mem[0].memtype = UIO_MEM_LOGICAL;
+  uioinfo->mem[0].memtype = UIO_MEM_VIRTUAL;
   uioinfo->version = "0.1";
-  uioinfo->name = "OVC4Cam_Control";
+  uioinfo->name = "ovc4cam_control";
 
   if (uio_register_device(dev, uioinfo))
     dev_err(dev, "error registering uio device\n");
 
   priv->uioinfo = uioinfo;
-
 
   tegracam_set_privdata(tc_dev, (void *)priv);
 
@@ -433,6 +445,7 @@ static int ovc4cam_probe(struct i2c_client *client,
   }
 
   dev_info(dev, "ovc4cam probed successfully\n");
+  uiomap->sensor_id = last_sensor_id;
 
   return 0;
 }
@@ -445,6 +458,9 @@ ovc4cam_remove(struct i2c_client *client)
 
   tegracam_v4l2subdev_unregister(priv->tc_dev);
   tegracam_device_unregister(priv->tc_dev);
+
+  // Free valloc memory
+  vfree((void *)priv->uioinfo->mem[0].addr);
 
   return 0;
 }
@@ -469,6 +485,6 @@ static struct i2c_driver ovc4cam_i2c_driver = {
 
 module_i2c_driver(ovc4cam_i2c_driver);
 
-MODULE_DESCRIPTION("Media Controller driver for Sony IMX185");
-MODULE_AUTHOR("NVIDIA Corporation");
+MODULE_DESCRIPTION("Driver for OVC4 cameras");
+MODULE_AUTHOR("Open Robotics");
 MODULE_LICENSE("GPL v2");
