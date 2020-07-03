@@ -149,6 +149,7 @@ static int ovc4cam_power_on(struct camera_common_data *s_data)
   struct camera_common_pdata *pdata = s_data->pdata;
   struct device *dev = s_data->dev;
 
+  dev_info(dev, "Powering on sensor\n");
   dev_dbg(dev, "%s: power on\n", __func__);
   if (pdata && pdata->power_on) {
     err = pdata->power_on(pw);
@@ -161,11 +162,14 @@ static int ovc4cam_power_on(struct camera_common_data *s_data)
 
   /*exit reset mode: XCLR */
   if (pw->reset_gpio) {
+    dev_info(dev, "Found reset gpio\n");
     gpio_set_value(pw->reset_gpio, 0);
     usleep_range(30, 50);
     gpio_set_value(pw->reset_gpio, 1);
     usleep_range(30, 50);
   }
+  else
+    dev_info(dev, "gpio not found\n");
 
   pw->state = SWITCH_ON;
   return 0;
@@ -180,6 +184,7 @@ static int ovc4cam_power_off(struct camera_common_data *s_data)
   struct device *dev = s_data->dev;
 
   dev_dbg(dev, "%s: power off\n", __func__);
+  dev_info(dev, "Powering off sensor\n");
 
   if (pdata && pdata->power_off) {
     err = pdata->power_off(pw);
@@ -191,8 +196,9 @@ static int ovc4cam_power_off(struct camera_common_data *s_data)
   }
   /* enter reset mode: XCLR */
   usleep_range(1, 2);
-  if (pw->reset_gpio)
-    gpio_set_value(pw->reset_gpio, 0);
+  // Hacky, only for testing
+  //if (pw->reset_gpio)
+  //  gpio_set_value(pw->reset_gpio, 0);
 
 power_off_done:
   pw->state = SWITCH_OFF;

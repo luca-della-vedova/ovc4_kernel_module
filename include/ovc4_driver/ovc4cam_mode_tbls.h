@@ -67,6 +67,48 @@ static ovc4cam_reg ovc4cam_mode_common[] = {
 	{OVC4CAM_TABLE_END, 0x00}
 };
 
+static ovc4cam_reg ovc4cam_mode_1920x1080_30fps[] = {
+	/* capture settings */
+	{0x0157, 0x00}, /* ANALOG_GAIN_GLOBAL[7:0] */
+	{0x015A, 0x06}, /* COARSE_INTEG_TIME[15:8] */
+	{0x015B, 0xde}, /* COARSE_INTEG_TIME[7:0] */
+	/* format settings */
+	{0x0160, 0x06}, /* FRM_LENGTH[15:8] */
+	{0x0161, 0xE2}, /* FRM_LENGTH[7:0] */
+	{0x0162, 0x0D}, /* LINE_LENGTH[15:8] */
+	{0x0163, 0x78}, /* LINE_LENGTH[7:0] */
+	{0x0164, 0x02},
+	{0x0165, 0xA8},
+	{0x0166, 0x0A},
+	{0x0167, 0x27},
+	{0x0168, 0x02},
+	{0x0169, 0xB4},
+	{0x016A, 0x06},
+	{0x016B, 0xEB},
+	{0x016C, 0x07},
+	{0x016D, 0x80},
+	{0x016E, 0x04},
+	{0x016F, 0x38},
+	{0x0170, 0x01},
+	{0x0171, 0x01},
+	{0x0174, 0x00},
+	{0x0175, 0x00},
+	{0x018C, 0x0A},
+	{0x018D, 0x0A},
+	/* clocks dividers */
+	{0x0301, 0x05},
+	{0x0303, 0x01},
+	{0x0304, 0x03},
+	{0x0305, 0x03},
+	{0x0306, 0x00},
+	{0x0307, 0x39},
+	{0x0309, 0x0A},
+	{0x030B, 0x01},
+	{0x030C, 0x00},
+	{0x030D, 0x72},
+	{OVC4CAM_TABLE_END, 0x00}
+};
+
 static ovc4cam_reg ovc4cam_mode_3264x2464_21fps[] = {
 	/* capture settings */
 	{0x0157, 0x00}, /* ANALOG_GAIN_GLOBAL[7:0] */
@@ -116,7 +158,8 @@ static ovc4cam_reg ovc4cam_mode_3264x2464_21fps[] = {
 };
 
 enum {
-	OVC4CAM_MODE_3264x2464_21FPS,
+	//OVC4CAM_MODE_3264x2464_21FPS,
+  OVC4CAM_MODE_1920x1080_30FPS,
 
 	OVC4CAM_MODE_COMMON,
 	OVC4CAM_START_STREAM,
@@ -124,7 +167,8 @@ enum {
 };
 
 static ovc4cam_reg *mode_table[] = {
-	[OVC4CAM_MODE_3264x2464_21FPS] = ovc4cam_mode_3264x2464_21fps,
+	[OVC4CAM_MODE_1920x1080_30FPS] = ovc4cam_mode_1920x1080_30fps,
+	//[OVC4CAM_MODE_3264x2464_21FPS] = ovc4cam_mode_3264x2464_21fps,
 
 	[OVC4CAM_MODE_COMMON]  = ovc4cam_mode_common,
 	[OVC4CAM_START_STREAM]  = ovc4cam_start_stream,
@@ -135,12 +179,16 @@ static const int ovc4cam_21fps[] = {
 	21,
 };
 
+static const int ovc4cam_30fps[] = {
+	30,
+};
 /*
  * WARNING: frmfmt ordering need to match mode definition in
  * device tree!
  */
 static const struct camera_common_frmfmt ovc4cam_frmfmt[] = {
-	{{3264, 2464},	ovc4cam_21fps, 1, 0, OVC4CAM_MODE_3264x2464_21FPS},
+	{{1920, 1080},	ovc4cam_30fps, 1, 0, OVC4CAM_MODE_1920x1080_30FPS},
+	//{{3264, 2464},	ovc4cam_21fps, 1, 0, OVC4CAM_MODE_3264x2464_21FPS},
 	/* Add modes with no device tree support after below */
   /*
 	{{3264, 1848},	ovc4cam_28fps, 1, 0, OVC4CAM_MODE_3264x1848_28FPS},
