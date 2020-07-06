@@ -435,6 +435,7 @@ static int ovc4cam_probe(struct i2c_client *client,
     dev_err(dev, "error registering uio device\n");
 
   priv->uioinfo = uioinfo;
+  priv->uiomap = uiomap;
 
   tegracam_set_privdata(tc_dev, (void *)priv);
 
