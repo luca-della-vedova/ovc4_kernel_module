@@ -467,6 +467,7 @@ ovc4cam_remove(struct i2c_client *client)
 
   // Free valloc memory
   vfree((void *)priv->uioinfo->mem[0].addr);
+  uio_unregister_device(priv->uioinfo);
 
   return 0;
 }
