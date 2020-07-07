@@ -3,6 +3,7 @@ struct uio_map {
   u32 test_val;
   s64 gain;
   s64 exposure;
+  s64 frame_length;
   s64 exposure_short; // For HDR
 
 };
