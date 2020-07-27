@@ -61,12 +61,17 @@ static ovc4cam_reg *mode_table[] = {
 static const int ovc4cam_30fps[] = {
 	30,
 };
+
+static const int ovc4cam_60fps[] = {
+	60,
+};
 /*
  * WARNING: frmfmt ordering need to match mode definition in
  * device tree!
  */
 static const struct camera_common_frmfmt ovc4cam_frmfmt[] = {
 	{{1920, 1080},	ovc4cam_30fps, 1, 0, OVC4CAM_MODE_1920x1080_30FPS},
+	{{1920, 1080},	ovc4cam_60fps, 1, 0, OVC4CAM_MODE_1920x1080_30FPS},
 	//{{3264, 2464},	ovc4cam_21fps, 1, 0, OVC4CAM_MODE_3264x2464_21FPS},
 	/* Add modes with no device tree support after below */
   /*
