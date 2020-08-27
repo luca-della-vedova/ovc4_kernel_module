@@ -37,12 +37,20 @@ static ovc4cam_reg ovc4cam_mode_common[] = {
 static ovc4cam_reg ovc4cam_mode_1920x1080_30fps[] = {
 };
 
+static ovc4cam_reg ovc4cam_mode_1920x1080_60fps[] = {
+};
+
 static ovc4cam_reg ovc4cam_mode_3264x2464_21fps[] = {
+};
+
+static ovc4cam_reg ovc4cam_mode_2592x1944_30fps[] = {
 };
 
 enum {
 	//OVC4CAM_MODE_3264x2464_21FPS,
-  OVC4CAM_MODE_1920x1080_30FPS,
+  //OVC4CAM_MODE_1920x1080_30FPS,
+  //OVC4CAM_MODE_1920x1080_60FPS,
+  OVC4CAM_MODE_2592x1944_30FPS,
 
 	OVC4CAM_MODE_COMMON,
 	OVC4CAM_START_STREAM,
@@ -50,7 +58,9 @@ enum {
 };
 
 static ovc4cam_reg *mode_table[] = {
-	[OVC4CAM_MODE_1920x1080_30FPS] = ovc4cam_mode_1920x1080_30fps,
+	//[OVC4CAM_MODE_1920x1080_30FPS] = ovc4cam_mode_1920x1080_30fps,
+	//[OVC4CAM_MODE_1920x1080_60FPS] = ovc4cam_mode_1920x1080_60fps,
+	[OVC4CAM_MODE_2592x1944_30FPS] = ovc4cam_mode_2592x1944_30fps,
 	//[OVC4CAM_MODE_3264x2464_21FPS] = ovc4cam_mode_3264x2464_21fps,
 
 	[OVC4CAM_MODE_COMMON]  = ovc4cam_mode_common,
@@ -62,6 +72,10 @@ static const int ovc4cam_30fps[] = {
 	30,
 };
 
+static const int ovc4cam_30fps_2[] = {
+	30,
+};
+
 static const int ovc4cam_60fps[] = {
 	60,
 };
@@ -70,8 +84,10 @@ static const int ovc4cam_60fps[] = {
  * device tree!
  */
 static const struct camera_common_frmfmt ovc4cam_frmfmt[] = {
-	{{1920, 1080},	ovc4cam_30fps, 1, 0, OVC4CAM_MODE_1920x1080_30FPS},
-	{{1920, 1080},	ovc4cam_60fps, 1, 0, OVC4CAM_MODE_1920x1080_30FPS},
+	//{{1920, 1080},	ovc4cam_30fps, 1, 0, OVC4CAM_MODE_1920x1080_30FPS},
+	//{{1920, 1080},	ovc4cam_60fps, 1, 0, OVC4CAM_MODE_1920x1080_60FPS},
+	{{2592, 1944},	ovc4cam_30fps_2, 1, 0, OVC4CAM_MODE_2592x1944_30FPS},
+	//{{1280, 720},	ovc4cam_30fps_2, 1, 0, OVC4CAM_MODE_2592x1944_30FPS},
 	//{{3264, 2464},	ovc4cam_21fps, 1, 0, OVC4CAM_MODE_3264x2464_21FPS},
 	/* Add modes with no device tree support after below */
   /*
