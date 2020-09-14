@@ -91,7 +91,6 @@ static int ovc4cam_set_gain(struct tegracam_device *tc_dev, s64 val)
   // Set the gain to be accessed through mmap
   struct ovc4cam *priv = (struct ovc4cam *)tc_dev->priv;
   priv->uiomap->gain = val;
-  dev_info(tc_dev->dev, "Setting gain to %u\n", val);
   return 0;
 }
 
@@ -100,7 +99,6 @@ static int ovc4cam_set_exposure(struct tegracam_device *tc_dev, s64 val)
   // Set the exposure to be accessed through mmap
   struct ovc4cam *priv = (struct ovc4cam *)tc_dev->priv;
   priv->uiomap->exposure = val;
-  dev_info(tc_dev->dev, "Setting exposure to %u\n", val);
   return 0;
 }
 
@@ -109,7 +107,6 @@ static int ovc4cam_set_frame_rate(struct tegracam_device *tc_dev, s64 val)
   // Unimplemented
   struct ovc4cam *priv = (struct ovc4cam *)tc_dev->priv;
   priv->uiomap->frame_length = val;
-  dev_info(tc_dev->dev, "Setting frame_length to %u\n", val);
   return 0;
 }
 
